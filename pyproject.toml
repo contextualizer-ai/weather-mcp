@@ -62,6 +62,7 @@ Documentation = "https://github.com/contextualizer-ai/weather-mcp#readme"
 
 [project.scripts]
 weather-context-mcp = "weather_mcp.__main__:main"
+weather-mcp = "weather_mcp.__main__:main"
 
 [tool.hatch.version]
 source = "vcs"

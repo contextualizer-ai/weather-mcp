@@ -24,8 +24,14 @@ loc_pacific_ocean = Point(0, 5)
 def test_get_weather_no_coverage():
     logger.setLevel(logging.DEBUG)
     test_coords = loc_pacific_ocean
-    get_weather(test_coords._lat, test_coords._lon)
+    result = get_weather(test_coords._lat, test_coords._lon)
 
+    # Assert that the result is None or matches expected behavior for no coverage
+    assert result is None or isinstance(result, dict)
+    if isinstance(result, dict):
+        assert "coverage" in result
+        assert isinstance(result["coverage"], float)
+        assert result["coverage"] == 0.0  # Expect 0.0 coverage for the Pacific Ocean
 
 def test_get_weather_invalid_timeseries():
     test_coords = loc_talledega_natlforst

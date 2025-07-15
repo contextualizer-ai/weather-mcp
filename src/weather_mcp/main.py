@@ -128,7 +128,6 @@ def find_nearest_station_with_best_coverage(
     units_class = UNITS_MAP[measurement_units]
 
     api_query = None
-    station = None
     best_coverage: float = 0.0
 
     for index, station_row in stations.iterrows():

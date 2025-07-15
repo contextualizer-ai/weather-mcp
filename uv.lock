@@ -1851,7 +1851,7 @@ wheels = [
 ]
 
 [[package]]
-name = "weather-mcp"
+name = "weather-context-mcp"
 source = { editable = "." }
 dependencies = [
     { name = "fastmcp" },

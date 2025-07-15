@@ -8,7 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+    permissions:
+      id-token: write # Add this to allow OIDC token fetching
+
     steps:
     - uses: actions/checkout@v4
       with:
@@ -31,6 +33,9 @@ jobs:
       run: uv build
 
     - name: Publish to PyPI
-      env:
-        UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-      run: uv publish
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        # This action automatically handles OIDC token exchange
+        # No need for a token secret here
+        # The project name on PyPI is 'weather-context-mcp'
+        # The action will find the distribution files in dist/

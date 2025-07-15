@@ -235,7 +235,7 @@ def get_weather(
         coverage: float = api_query.coverage()
         # noinspection PyArgumentList
         stations: Index = api_query.stations
-        print(stations)
+        logger.debug(stations)
         station_id: str | None = stations[0] if len(stations) > 0 else None
         # noinspection PyArgumentList
         weather_df: pandas.DataFrame = api_query.fetch()

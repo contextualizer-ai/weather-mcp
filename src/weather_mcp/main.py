@@ -153,7 +153,7 @@ def get_weather(lat: float, lon: float, date: str = None, search_radius_km: int 
         # noinspection PyArgumentList
         coverage: float = api_query.coverage()
         # noinspection PyArgumentList
-        stations: Index = api_query.stations()
+        stations: Index = api_query.stations
         print(stations)
         station_id: str = stations[0] if len(stations) > 0 else None
         # noinspection PyArgumentList

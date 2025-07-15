@@ -28,7 +28,6 @@ def test_get_weather_no_coverage():
 def test_get_weather_invalid_timeseries():
     with pytest.raises(KeyError):
         test_coords = loc_talledega_natlforst
-        weather = get_weather(test_coords._lat, test_coords._lon)
         get_weather(test_coords._lat, test_coords._lon, timeseries_type='invalid')
 
 def test_get_weather1():
@@ -46,7 +45,7 @@ def test_get_weather1():
     assert 0.0 <= weather['coverage'] <= 1.0
 
     assert isinstance(weather['data'], dict)
-    assert isinstance(weather['station'], dict)
+    assert isinstance(weather['station'], str)
 
     # confirm that at least one value inside data is a dict
     assert any(isinstance(v, dict) for v in weather['data'].values())
@@ -82,7 +81,7 @@ def test_get_weather2():
     assert 0.0 <= weather['coverage'] <= 1.0
 
     assert isinstance(weather['data'], dict)
-    assert isinstance(weather['station'], dict)
+    assert isinstance(weather['station'], str)
 
     # confirm that at least one value inside data is a dict
     assert any(isinstance(v, dict) for v in weather['data'].values())

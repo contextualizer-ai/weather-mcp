@@ -11,7 +11,6 @@ from importlib import metadata
 import pandas as pandas
 from fastmcp import FastMCP
 from meteostat import Daily, Hourly, Point, Stations, units
-from pandas import Index
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +128,6 @@ def find_nearest_station_with_best_coverage(
     units_class = UNITS_MAP[measurement_units]
 
     api_query = None
-    station_id = None
     station = None
     best_coverage: float = 0.0
 
@@ -144,11 +142,10 @@ def find_nearest_station_with_best_coverage(
 
         if coverage > best_coverage:
             logger.debug(
-                f"Found{' better' if station_id is not None else ''} station: "
+                f"Found{' better' if station is not None else ''} station: "
                 f"{index} with {coverage:.2%} coverage."
             )
             api_query = timeseries_query
-            station_id = index
             station = station_row
             best_coverage = coverage
             if coverage >= coverage_threshold:
@@ -162,23 +159,13 @@ def find_nearest_station_with_best_coverage(
     # noinspection PyArgumentList
     api_query.convert(units_class)
 
-    if station is not None:
-        logger.info(
-            f"The nearest weather station with {best_coverage:.2%} coverage is "
-            f"Meteostat station {station_id} "
-            f"(WMO {station['wmo']}, ICAO airport code {station['icao']}) "
-            f"near {station['name']}, {station['region']}, {station['country']} "
-            f"({station['distance'] / 1000:.1f} km away at an elevation of "
-            f"{station['elevation']:.0f} m) in the {station['timezone']} time zone."
-        )
-
     if logger.isEnabledFor(logging.DEBUG):
         pandas.set_option("display.max_rows", None)
         pandas.set_option("display.max_columns", None)
 
     logger.debug(station)
 
-    return api_query
+    return api_query, station
 
 
 def get_weather(
@@ -221,7 +208,7 @@ def get_weather(
         #     s, date, timeseries_type, coverage_threshold, measurement_units
         # )
 
-        api_query = find_nearest_station_with_best_coverage(
+        api_query, station = find_nearest_station_with_best_coverage(
             lat=point._lat,
             lon=point._lon,
             search_radius_km=search_radius_km,
@@ -234,19 +221,17 @@ def get_weather(
         # noinspection PyArgumentList
         coverage: float = api_query.coverage()
         # noinspection PyArgumentList
-        stations: Index = api_query.stations
-        logger.debug(stations)
-        station_id: str | None = stations[0] if len(stations) > 0 else None
-        # noinspection PyArgumentList
         weather_df: pandas.DataFrame = api_query.fetch()
 
         logger.debug(weather_df)
 
         return {
             "data": weather_df.to_dict(),
-            "station": station_id,  # station.to_dict(),
+            "station": station.to_dict(),
             "coverage": coverage,
         }
+    except KeyError:
+        raise
     except Exception as e:
         import traceback
 

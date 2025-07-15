@@ -1,5 +1,6 @@
 import logging
 
+import pytest
 from meteostat import Point
 
 from weather_mcp.main import get_weather
@@ -33,10 +34,11 @@ def test_get_weather_no_coverage():
         assert isinstance(result["coverage"], float)
         assert result["coverage"] == 0.0  # Expect 0.0 coverage for the Pacific Ocean
 
+
 def test_get_weather_invalid_timeseries():
     test_coords = loc_talledega_natlforst
-    result = get_weather(test_coords._lat, test_coords._lon, timeseries_type="invalid")
-    assert result is None  # Should return None for invalid timeseries_type
+    with pytest.raises(KeyError):
+        get_weather(test_coords._lat, test_coords._lon, timeseries_type="invalid")
 
 
 def test_get_weather1():
@@ -54,7 +56,7 @@ def test_get_weather1():
     assert 0.0 <= weather["coverage"] <= 1.0
 
     assert isinstance(weather["data"], dict)
-    assert isinstance(weather["station"], str)
+    assert isinstance(weather["station"], dict)
 
     # confirm that at least one value inside data is a dict
     assert any(isinstance(v, dict) for v in weather["data"].values())
@@ -91,7 +93,7 @@ def test_get_weather2():
     assert 0.0 <= weather["coverage"] <= 1.0
 
     assert isinstance(weather["data"], dict)
-    assert isinstance(weather["station"], str)
+    assert isinstance(weather["station"], dict)
 
     # confirm that at least one value inside data is a dict
     assert any(isinstance(v, dict) for v in weather["data"].values())

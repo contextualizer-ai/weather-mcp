@@ -5,6 +5,7 @@ These tests verify that the MCP server correctly implements the protocol and
 responds to standard MCP requests.
 """
 
+
 def test_mcp_tool_registration():
     """Test that MCP tools are properly registered."""
     from weather_mcp.main import mcp

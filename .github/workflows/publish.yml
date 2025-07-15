@@ -58,7 +58,10 @@ jobs:
         run: uv tool install hatch
 
       - name: Build package with hatch
-        run: hatch build
+        run: |
+          # Tell git to ignore version file changes during build
+          git update-index --skip-worktree src/weather_mcp/_version.py || true
+          hatch build
 
       - name: Check package
         run: |

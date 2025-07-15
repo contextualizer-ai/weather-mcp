@@ -66,9 +66,6 @@ weather-mcp = "weather_mcp.__main__:main"
 [tool.hatch.version]
 source = "vcs"
 
-[tool.hatch.version.vcs]
-tag-regex = "^v(?P<version>[^\\+]+)(?:\\+.*)?$"
-
 [tool.hatch.build.hooks.vcs]
 version-file = "src/weather_mcp/_version.py"
 

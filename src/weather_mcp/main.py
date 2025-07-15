@@ -4,7 +4,9 @@
 ################################################################################
 
 import logging
+import sys
 from datetime import datetime, timedelta
+from importlib import metadata
 
 import pandas as pandas
 from fastmcp import FastMCP
@@ -12,6 +14,16 @@ from meteostat import Daily, Hourly, Point, Stations, units
 from pandas import Index
 
 logger = logging.getLogger(__name__)
+
+# Version handling
+try:
+    __version__ = metadata.version("weather-mcp")
+except metadata.PackageNotFoundError:
+    # Fallback to _version.py if package not installed
+    try:
+        from ._version import __version__
+    except ImportError:
+        __version__ = "unknown"
 
 TIMESERIES_MAP = {"hourly": Hourly, "daily": Daily}
 
@@ -256,6 +268,9 @@ mcp.tool(get_weather)
 
 def main():
     """Main entry point for the application."""
+    if "--version" in sys.argv:
+        print(__version__)
+        sys.exit(0)
     mcp.run()
 
 

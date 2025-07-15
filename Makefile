@@ -92,7 +92,7 @@ test-mcp-extended:
 	 sleep 0.1; \
 	 echo '{"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}}'; \
 	 sleep 0.1; \
-	 echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "get_weather", "arguments": {"location": "San Francisco, CA"}}, "id": 3}') | \
+	 echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "get_weather", "arguments": {"lat": 37.7749, "lon": -122.4194}}, "id": 3}') | \
 	uv run python src/weather_mcp/main.py
 
 # Test version flag

@@ -61,7 +61,7 @@ Issues = "https://github.com/contextualizer-ai/weather-mcp/issues"
 Documentation = "https://github.com/contextualizer-ai/weather-mcp#readme"
 
 [project.scripts]
-weather-mcp = "weather_mcp.main:main"
+weather-mcp = "weather_mcp.__main__:main"
 
 [tool.hatch.version]
 source = "vcs"

@@ -129,6 +129,7 @@ def find_nearest_station_with_best_coverage(
 
     api_query = None
     best_coverage: float = 0.0
+    station = None
 
     for index, station_row in stations.iterrows():
         station_df = stations.loc[[index]]

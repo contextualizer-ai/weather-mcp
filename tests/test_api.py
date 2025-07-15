@@ -75,7 +75,7 @@ def test_get_weather1():
     for _timestamp, value in col_data.items():
         # You could allow None or NaN if those exist in your data
         if value is not None:
-            assert isinstance(value, Union[int, float])
+            assert isinstance(value, int | float)
 
 
 def test_get_weather2():
@@ -112,4 +112,4 @@ def test_get_weather2():
     for _timestamp, value in col_data.items():
         # You could allow None or NaN if those exist in your data
         if value is not None:
-            assert isinstance(value, Union[int, float])
+            assert isinstance(value, int | float)

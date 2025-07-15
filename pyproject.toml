@@ -3,7 +3,7 @@ requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
-name = "weather-mcp"
+name = "weather-context-mcp"
 dynamic = ["version"]
 description = "An MCP for retrieving historical weather data for a given location"
 readme = "README.md"

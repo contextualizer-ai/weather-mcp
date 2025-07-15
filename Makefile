@@ -1,184 +1,118 @@
-# Weather MCP - Development Makefile
-# Automates setup, testing, and quality control for the weather-mcp project
-
-.PHONY: help setup test lint format typecheck clean dev ci run install-uv check-uv all
+.PHONY: test-coverage clean install dev format lint all server build upload-test upload release deptry mypy test-mcp test-mcp-extended test-integration test-version
 
 # Default target
-.DEFAULT_GOAL := help
+all: clean install dev test-coverage format lint mypy deptry build test-mcp test-mcp-extended test-integration test-version
 
-# Colors for output
-GREEN := \033[0;32m
-YELLOW := \033[1;33m
-RED := \033[0;31m
-NC := \033[0m # No Color
+# Install everything for development
+dev:
+	uv sync --group dev
 
-# Check if uv is installed
-check-uv:
-	@command -v uv >/dev/null 2>&1 || { \
-		echo "$(RED)Error: uv is not installed. Please install it first:$(NC)"; \
-		echo "  curl -LsSf https://astral.sh/uv/install.sh | sh"; \
-		echo "  or visit: https://github.com/astral-sh/uv"; \
-		exit 1; \
-	}
-
-# Install uv if not present (optional target)
-install-uv:
-	@if ! command -v uv >/dev/null 2>&1; then \
-		echo "$(YELLOW)Installing uv...$(NC)"; \
-		curl -LsSf https://astral.sh/uv/install.sh | sh; \
-	else \
-		echo "$(GREEN)uv is already installed$(NC)"; \
-	fi
-
-# Initial project setup - install dependencies
-setup: check-uv
-	@echo "$(YELLOW)Setting up project dependencies...$(NC)"
+# Install production only
+install:
 	uv sync
-	@echo "$(GREEN)✅ Dependencies installed successfully$(NC)"
 
-# Run all tests
-test: setup
-	@echo "$(YELLOW)Running tests...$(NC)"
-	uv run pytest -v
-	@echo "$(GREEN)✅ All tests passed$(NC)"
+# Run tests with coverage
+test-coverage:
+	uv run pytest --cov=weather_mcp --cov-report=html --cov-report=term tests/
 
-# Run linting with auto-fix
-lint: setup
-	@echo "$(YELLOW)Running linting (with auto-fix)...$(NC)"
-	uv run ruff check --fix --unsafe-fixes || { \
-		echo "$(YELLOW)⚠️  Some linting issues remain (line length, etc.)$(NC)"; \
-		echo "$(YELLOW)   These don't affect functionality$(NC)"; \
-		true; \
-	}
-	@echo "$(GREEN)✅ Linting completed$(NC)"
-
-# Run code formatting
-format: setup
-	@echo "$(YELLOW)Running code formatting...$(NC)"
-	uv run ruff format
-	@echo "$(GREEN)✅ Code formatted$(NC)"
-
-# Run type checking
-typecheck: setup
-	@echo "$(YELLOW)Running type checking...$(NC)"
-	uv run mypy src/weather_mcp/
-	@echo "$(GREEN)✅ Type checking completed$(NC)"
-
-# Clean up temporary files
+# Clean up build artifacts
 clean:
-	@echo "$(YELLOW)Cleaning up temporary files...$(NC)"
+	rm -rf build/
+	rm -rf dist/
+	rm -rf *.egg-info
+	rm -rf htmlcov/
+	rm -f .coverage
+	find . -type d -name __pycache__ -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
-	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	find . -type d -name "*.egg-info" -exec rm -rf {} + 2>/dev/null || true
-	find . -name ".pytest_cache" -exec rm -rf {} + 2>/dev/null || true
-	find . -name ".mypy_cache" -exec rm -rf {} + 2>/dev/null || true
-	find . -name ".ruff_cache" -exec rm -rf {} + 2>/dev/null || true
-	@echo "$(GREEN)✅ Cleanup completed$(NC)"
+	rm -rf src/*.egg-info
 
-# Development setup - run all QC checks
-dev: setup lint format test typecheck
-	@echo "$(GREEN)🚀 Development environment ready!$(NC)"
-	@echo "$(GREEN)   All setup and quality checks completed$(NC)"
-	@echo "$(GREEN)   You can now run: make run$(NC)"
+# Run server mode
+server:
+	uv run python src/weather_mcp/main.py
 
-# Continuous Integration target - strict checks without auto-fix
-ci: setup
-	@echo "$(YELLOW)Running CI checks...$(NC)"
-	uv run ruff check --no-fix
-	uv run ruff format --check
-	uv run pytest -v
-	uv run mypy src/weather_mcp/
-	@echo "$(GREEN)✅ All CI checks passed$(NC)"
+# Format code with black
+format:
+	uv run black src/ tests/
 
-# Run the weather MCP server
-run: setup
-	@echo "$(YELLOW)Starting weather MCP server...$(NC)"
-	@echo "$(YELLOW)Press Ctrl+C to stop the server$(NC)"
-	uv run weather-mcp
+# Lint code with ruff
+lint:
+	uv run ruff check --fix src/ tests/
 
-# Quick test of CLI functionality
-test-cli: setup
-	@echo "$(YELLOW)Testing CLI functionality...$(NC)"
-	timeout 5 uv run weather-mcp --help 2>/dev/null || { \
-		echo "$(GREEN)✅ CLI starts successfully$(NC)"; \
-	}
+# Check for unused dependencies
+deptry:
+	uvx deptry .
 
-# Run a specific test file
-test-file: setup
-	@echo "$(YELLOW)Running specific test file...$(NC)"
-	@read -p "Enter test file (e.g., tests/test_api.py): " file; \
-	uv run pytest -v $$file
+# Type checking
+mypy:
+	uv run mypy src/
 
-# Show coverage report
-coverage: setup
-	@echo "$(YELLOW)Running tests with coverage...$(NC)"
-	uv run pytest --cov=src/weather_mcp --cov-report=html --cov-report=term-missing
-	@echo "$(GREEN)✅ Coverage report generated in htmlcov/$(NC)"
+# Build package with uv
+build:
+	uv build
 
-# Lint only (no auto-fix) - for checking before commits
-lint-check: setup
-	@echo "$(YELLOW)Checking linting (no auto-fix)...$(NC)"
-	uv run ruff check --no-fix
+# Upload to TestPyPI (using token-based auth - set UV_PUBLISH_TOKEN environment variable first)
+upload-test:
+	uv publish --publish-url https://test.pypi.org/legacy/
 
-# Format check only (no changes) - for checking before commits
-format-check: setup
-	@echo "$(YELLOW)Checking formatting (no changes)...$(NC)"
-	uv run ruff format --check
+# Upload to PyPI (using token-based auth - set UV_PUBLISH_TOKEN environment variable first)  
+upload:
+	uv publish
 
-# Quick quality check (fast version of dev)
-quick-check: setup lint format
-	@echo "$(GREEN)✅ Quick quality check completed$(NC)"
+# Complete release workflow
+release: clean install test-coverage build
 
-# Full quality check (everything)
-full-check: setup lint format test typecheck test-cli
-	@echo "$(GREEN)🎉 Full quality check completed successfully!$(NC)"
+# Integration Testing
+test-integration:
+	@echo "🌤️ Testing weather MCP integration..."
+	uv run pytest tests/test_api.py -v
 
-# Run everything - complete setup, all checks, and coverage
-all: setup lint format test typecheck test-cli coverage
-	@echo "$(GREEN)🎉 All tasks completed successfully!$(NC)"
-	@echo "$(GREEN)   - Dependencies installed$(NC)"
-	@echo "$(GREEN)   - Code linted and formatted$(NC)"
-	@echo "$(GREEN)   - All tests passed$(NC)"
-	@echo "$(GREEN)   - Type checking completed$(NC)"
-	@echo "$(GREEN)   - CLI functionality verified$(NC)"
-	@echo "$(GREEN)   - Coverage report generated$(NC)"
+# Real-world Integration Testing
+test-real-world-integration:
+	@echo "🌐 Testing real-world integration..."
+	uv run pytest tests/test_real_world_integration.py -v
 
-# Show help
-help:
-	@echo "$(GREEN)Weather MCP Development Makefile$(NC)"
-	@echo ""
-	@echo "$(YELLOW)Primary targets:$(NC)"
-	@echo "  $(GREEN)help$(NC)           Show this help message"
-	@echo "  $(GREEN)setup$(NC)          Install project dependencies"
-	@echo "  $(GREEN)dev$(NC)            Full development setup (recommended for new setup)"
-	@echo "  $(GREEN)all$(NC)            Run everything (setup + all QC + coverage)"
-	@echo "  $(GREEN)run$(NC)            Start the weather MCP server"
-	@echo ""
-	@echo "$(YELLOW)Quality Control:$(NC)"
-	@echo "  $(GREEN)test$(NC)           Run all tests"
-	@echo "  $(GREEN)lint$(NC)           Run linting with auto-fix"
-	@echo "  $(GREEN)format$(NC)         Run code formatting"
-	@echo "  $(GREEN)typecheck$(NC)      Run type checking"
-	@echo "  $(GREEN)quick-check$(NC)    Run lint + format (fast QC)"
-	@echo "  $(GREEN)full-check$(NC)     Run all quality checks"
-	@echo ""
-	@echo "$(YELLOW)CI/CD:$(NC)"
-	@echo "  $(GREEN)ci$(NC)             Run all checks for CI (strict, no auto-fix)"
-	@echo "  $(GREEN)lint-check$(NC)     Check linting without auto-fix"
-	@echo "  $(GREEN)format-check$(NC)   Check formatting without changes"
-	@echo ""
-	@echo "$(YELLOW)Testing:$(NC)"
-	@echo "  $(GREEN)test-file$(NC)      Run a specific test file"
-	@echo "  $(GREEN)coverage$(NC)       Run tests with coverage report"
-	@echo "  $(GREEN)test-cli$(NC)       Quick test of CLI functionality"
-	@echo ""
-	@echo "$(YELLOW)Utilities:$(NC)"
-	@echo "  $(GREEN)clean$(NC)          Clean up temporary files"
-	@echo "  $(GREEN)install-uv$(NC)     Install uv package manager"
-	@echo ""
-	@echo "$(YELLOW)Examples:$(NC)"
-	@echo "  $(GREEN)make dev$(NC)                 # Complete setup for new developers"
-	@echo "  $(GREEN)make all$(NC)                 # Run everything including coverage"
-	@echo "  $(GREEN)make quick-check$(NC)         # Fast quality check before commit"
-	@echo "  $(GREEN)make test-file$(NC)           # Run specific test file"
-	@echo "  $(GREEN)make ci$(NC)                  # Run all CI checks"
+# MCP Protocol Testing
+test-mcp-protocol:
+	@echo "🔧 Testing MCP protocol implementation..."
+	uv run pytest tests/test_mcp_protocol.py -v
+
+# MCP Server testing
+test-mcp:
+	@echo "Testing MCP protocol with tools listing..."
+	@(echo '{"jsonrpc": "2.0", "method": "initialize", "params": {"protocolVersion": "2025-03-26", "capabilities": {"tools": {}}, "clientInfo": {"name": "test-client", "version": "1.0.0"}}, "id": 1}'; \
+	 sleep 0.1; \
+	 echo '{"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}}'; \
+	 sleep 0.1; \
+	 echo '{"jsonrpc": "2.0", "method": "tools/list", "id": 2}') | \
+	timeout 5 uv run python src/weather_mcp/main.py
+
+test-mcp-extended:
+	@echo "Testing MCP protocol with tool execution..."
+	@(echo '{"jsonrpc": "2.0", "method": "initialize", "params": {"protocolVersion": "2025-03-26", "capabilities": {"tools": {}}, "clientInfo": {"name": "test-client", "version": "1.0.0"}}, "id": 1}'; \
+	 sleep 0.1; \
+	 echo '{"jsonrpc": "2.0", "method": "notifications/initialized", "params": {}}'; \
+	 sleep 0.1; \
+	 echo '{"jsonrpc": "2.0", "method": "tools/call", "params": {"name": "get_weather", "arguments": {"location": "San Francisco, CA"}}, "id": 3}') | \
+	uv run python src/weather_mcp/main.py
+
+# Test version flag
+test-version:
+	@echo "🔢 Testing version flag..."
+	uv run weather-mcp --version
+
+# WEATHER MCP - Claude Desktop config:
+#   Add to ~/Library/Application Support/Claude/claude_desktop_config.json:
+#   {
+#     "mcpServers": {
+#       "weather-mcp": {
+#         "command": "uvx",
+#         "args": ["weather-mcp"]
+#       }
+#     }
+#   }
+#
+# Claude Code MCP setup:
+#   claude mcp add -s project weather-mcp uvx weather-mcp
+#
+# Goose setup:
+#   goose session --with-extension "uvx weather-mcp"

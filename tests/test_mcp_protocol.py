@@ -1,10 +1,12 @@
 """
 MCP protocol tests for weather-mcp server.
 
-These tests verify that the MCP server correctly implements the protocol and responds to standard MCP requests.
+These tests verify that the MCP server correctly implements the protocol and
+responds to standard MCP requests.
 """
 
 # import pytest
+
 
 def test_mcp_tool_registration():
     """Test that MCP tools are properly registered."""

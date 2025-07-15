@@ -58,7 +58,7 @@ jobs:
         run: uv tool install hatch
 
       - name: Build package with hatch
-        run: uv tool run hatch build
+        run: hatch build
 
       - name: Check package
         run: |

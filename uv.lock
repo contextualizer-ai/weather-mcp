@@ -832,18 +832,6 @@ wheels = [
 ]
 
 [[package]]
-name = "nmdc-geoloc-tools"
-version = "0.2.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/5e/5a/7feac76b134b4ef0c2744e8ae9d41987160ce5bfaf53caaaa1e546827427/nmdc_geoloc_tools-0.2.1.tar.gz", hash = "sha256:9cff0f9fc1cb61c8ddacde425db99cfeec40f0ed0cce37c71076202f5832aa84", size = 8852 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/75/05/67a93dbd7cd530b3a2287ff255c0464af578fb9d0695d8e8a8238ebb3eaa/nmdc_geoloc_tools-0.2.1-py3-none-any.whl", hash = "sha256:ad549cb05f77602c1f27a2854803ead9e01518b6140f2e644f611f621c955a69", size = 9871 },
-]
-
-[[package]]
 name = "numpy"
 version = "2.2.6"
 source = { registry = "https://pypi.org/simple" }
@@ -1868,7 +1856,6 @@ source = { editable = "." }
 dependencies = [
     { name = "fastmcp" },
     { name = "meteostat" },
-    { name = "nmdc-geoloc-tools" },
     { name = "pandas" },
     { name = "requests" },
 ]
@@ -1893,7 +1880,6 @@ dev = [
 requires-dist = [
     { name = "fastmcp", specifier = ">=2.7.1" },
     { name = "meteostat", specifier = ">=1.7.4" },
-    { name = "nmdc-geoloc-tools", specifier = ">=0.2.1" },
     { name = "pandas", specifier = ">=2.3.0" },
     { name = "requests", specifier = ">=2.32.4" },
 ]

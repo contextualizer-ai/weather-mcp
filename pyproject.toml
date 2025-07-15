@@ -32,7 +32,6 @@ dependencies = [
     "fastmcp>=2.7.1",
     "pandas>=2.3.0",
     "requests>=2.32.4",
-    "nmdc-geoloc-tools>=0.2.1",
     "meteostat>=1.7.4",
 ]
 
@@ -62,7 +61,7 @@ Issues = "https://github.com/contextualizer-ai/weather-mcp/issues"
 Documentation = "https://github.com/contextualizer-ai/weather-mcp#readme"
 
 [project.scripts]
-weather-mcp = "weather_mcp.main:main"
+weather-mcp = "weather_mcp.__main__:main"
 
 [tool.hatch.version]
 source = "vcs"
@@ -155,7 +154,6 @@ pytest_asyncio = "pytest-asyncio"
 pytest_cov = "pytest-cov"
 hatch_vcs = "hatch-vcs"
 types_requests = "types-requests"
-nmdc_geoloc_tools = "nmdc-geoloc-tools"
 
 # Ignore specific error types for known false positives
 [tool.deptry.per_rule_ignores]

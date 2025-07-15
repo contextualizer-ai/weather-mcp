@@ -108,7 +108,7 @@ def find_nearest_station_with_best_coverage(lat: float, lon: float, search_radiu
             f"No stations in list have coverage for {s_time.strftime('%Y-%m-%d')}.")
 
     # noinspection PyArgumentList
-    api_query.convert(measurement_units)
+    api_query.convert(units_class)
 
     logger.info(
         f"The nearest weather station with {best_coverage:.2%} coverage is Meteostat station {station_id} "

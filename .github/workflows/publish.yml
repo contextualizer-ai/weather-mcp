@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write # Add this to allow OIDC token fetching
+      contents: read # Explicitly limit repository contents access
 
     steps:
     - uses: actions/checkout@v4

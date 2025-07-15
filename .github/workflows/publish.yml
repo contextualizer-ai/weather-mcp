@@ -71,8 +71,14 @@ jobs:
           PACKAGE_VERSION=$(hatch version)
           echo "Tag version: $TAG_VERSION"
           echo "Package version: $PACKAGE_VERSION"
+          echo "Git describe: $(git describe --tags --long)"
+          echo "Git status: $(git status --porcelain)"
           if [ "$TAG_VERSION" != "$PACKAGE_VERSION" ]; then
             echo "Version mismatch! Tag: $TAG_VERSION, Package: $PACKAGE_VERSION"
+            echo "This usually means:"
+            echo "1. The tag points to the wrong commit"
+            echo "2. There are commits after the tagged commit"
+            echo "3. Multiple tags point to the same commit"
             exit 1
           fi
 

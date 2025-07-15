@@ -30,9 +30,9 @@ clean:
 server:
 	uv run python src/weather_mcp/main.py
 
-# Format code with black
+# Format code with ruff
 format:
-	uv run black src/ tests/
+	uv run ruff check --fix src/ tests/
 
 # Lint code with ruff
 lint:
